@@ -1,6 +1,6 @@
 # QZMotorCenterElectroBike
 
-Microservicio para la gestion de motocicletas electricas de QZ Motor Center. El proyecto toma como referencia la idea y la logica CRUD del ZIP `QZMotorCenterScooter`, pero la adapta a un dominio mas completo para `ElectroBike`, agregando una base de datos relacional real, asincronia explicita, Docker, pruebas unitarias y documentacion tecnica completa.
+Microservicio para la gestion de motocicletas electricas de QZ Motor Center.
 
 ## Objetivo del microservicio
 
@@ -306,19 +306,6 @@ Durante la construccion del microservicio se validaron estos comandos:
 - `npm run check`
 - `npm test`
 - `docker compose --env-file .env.example config`
-
-## Diferencias clave frente al ZIP de referencia
-
-Comparado con `QZMotorCenterScooter`, este proyecto agrega:
-
-- una relacion real `Marca -> ElectroBike`
-- validaciones de negocio mas estrictas
-- manejo centralizado de errores
-- endpoint de resumen de catalogo
-- uso explicito de `Promise.all()` para asincronia
-- pruebas unitarias
-- README tecnico con diagramas Mermaid
-- configuracion lista para Docker Compose
 
 ## Resumen tecnico final
 
