@@ -1,0 +1,23 @@
+services:
+  - type: web
+    name: qzmotorcenter-electrobike-api
+    runtime: docker
+    plan: free
+    region: oregon
+    healthCheckPath: /api/health
+    envVars:
+      - key: PORT
+        value: "10000"
+      - key: DB_DIALECT
+        value: postgres
+      - key: DATABASE_URL
+        fromDatabase:
+          name: qzmotorcenter-electrobike-db
+          property: connectionString
+
+databases:
+  - name: qzmotorcenter-electrobike-db
+    plan: free
+    databaseName: qz_electrobike
+    user: qz_electrobike_user
+    ipAllowList: []

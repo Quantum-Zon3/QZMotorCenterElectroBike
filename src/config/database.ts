@@ -4,28 +4,67 @@ import { Sequelize } from "sequelize";
 
 dotenv.config();
 
+type SupportedDialect = "mysql" | "postgres";
+
 const databaseUrl = process.env.DATABASE_URL;
+const explicitDialect = process.env.DB_DIALECT;
+const inferDialect = (): SupportedDialect => {
+  if (explicitDialect === "mysql" || explicitDialect === "postgres") {
+    return explicitDialect;
+  }
+
+  if (databaseUrl) {
+    if (
+      databaseUrl.startsWith("postgres://") ||
+      databaseUrl.startsWith("postgresql://")
+    ) {
+      return "postgres";
+    }
+
+    if (databaseUrl.startsWith("mysql://")) {
+      return "mysql";
+    }
+  }
+
+  return "mysql";
+};
+
+const databaseDialect = inferDialect();
 const databaseName = process.env.DB_NAME ?? "qz_electrobike";
 const databaseUser = process.env.DB_USER ?? "root";
 const databasePassword = process.env.DB_PASSWORD ?? "";
 const databaseHost = process.env.DB_HOST ?? "localhost";
-const databasePort = Number(process.env.DB_PORT ?? 3306);
+const databasePort = Number(
+  process.env.DB_PORT ?? (databaseDialect === "postgres" ? 5432 : 3306),
+);
 const autoCreateDatabase = process.env.DB_AUTO_CREATE === "true";
+const databaseSsl = process.env.DB_SSL === "true";
+
+const dialectOptions = databaseSsl
+  ? {
+      ssl: {
+        require: true,
+        rejectUnauthorized: false,
+      },
+    }
+  : undefined;
 
 const sequelize = databaseUrl
   ? new Sequelize(databaseUrl, {
-      dialect: "mysql",
+      dialect: databaseDialect,
       logging: false,
+      dialectOptions,
     })
   : new Sequelize(databaseName, databaseUser, databasePassword, {
       host: databaseHost,
       port: databasePort,
-      dialect: "mysql",
+      dialect: databaseDialect,
       logging: false,
+      dialectOptions,
     });
 
 const ensureDatabaseExists = async (): Promise<void> => {
-  if (databaseUrl || !autoCreateDatabase) {
+  if (databaseDialect !== "mysql" || databaseUrl || !autoCreateDatabase) {
     return;
   }
 
@@ -51,5 +90,7 @@ export const initializeDatabase = async (): Promise<void> => {
   await sequelize.sync();
 };
 
+export const databaseEngineName =
+  databaseDialect === "postgres" ? "PostgreSQL" : "MySQL";
+export { databaseDialect };
 export default sequelize;
-

@@ -224,12 +224,15 @@ El proyecto incluye `.env.example` y una copia local `.env` para facilitar prueb
 | Variable | Descripcion | Ejemplo |
 |---|---|---|
 | `PORT` | Puerto de la API | `3000` |
-| `DB_HOST` | Host de MySQL | `localhost` |
-| `DB_PORT` | Puerto de MySQL | `3306` |
+| `DB_DIALECT` | Motor relacional a usar | `mysql` o `postgres` |
+| `DB_HOST` | Host de la base de datos | `localhost` |
+| `DB_PORT` | Puerto de la base de datos | `3306` |
 | `DB_NAME` | Nombre de la base de datos | `qz_electrobike` |
 | `DB_USER` | Usuario de la base de datos | `electrobike_user` |
 | `DB_PASSWORD` | Clave del usuario de la base de datos | `electrobike_pass` |
 | `DB_AUTO_CREATE` | Si la API intenta crear la base | `false` |
+| `DB_SSL` | Si se fuerza SSL para la conexion | `false` |
+| `DATABASE_URL` | Cadena completa de conexion, util en Render | `postgresql://...` |
 | `MYSQL_ROOT_PASSWORD` | Password root del contenedor MySQL | `root_secret` |
 
 ## Ejecucion local
@@ -240,7 +243,15 @@ El proyecto incluye `.env.example` y una copia local `.env` para facilitar prueb
 npm install
 ```
 
-2. Verificar que MySQL este disponible con las credenciales del `.env`.
+2. Levantar una base MySQL.
+
+Opcion recomendada para desarrollo local:
+
+```bash
+docker compose up -d db
+```
+
+Si prefieres una instalacion local de MySQL, debes asegurarte de que este escuchando en `localhost:3306` con las credenciales del archivo `.env`.
 
 3. Ejecutar en desarrollo:
 
@@ -279,6 +290,46 @@ docker compose down
 ```bash
 docker compose down -v
 ```
+
+## Despliegue en Render
+
+La opcion recomendada para este proyecto es:
+
+- `Web Service` usando el `Dockerfile` del repositorio
+- `Render Postgres` como base de datos relacional administrada
+
+Esto ya queda preparado en [render.yaml](/C:/Users/shado/Documents/GitHub/QZMotorCenterElectroBike/render.yaml).
+
+### Por que esta opcion es la recomendada
+
+Render ofrece PostgreSQL administrado de forma nativa, mientras que MySQL en Render normalmente implica desplegarlo como un servicio Docker separado. Para simplificar operacion, backups y conexion interna, el proyecto ahora soporta `PostgreSQL` en Render y mantiene `MySQL` para desarrollo local.
+
+### Pasos para desplegarlo
+
+1. Sube este repositorio a GitHub.
+2. En Render, elige `New +` -> `Blueprint`.
+3. Conecta el repositorio que contiene este proyecto.
+4. Render detectara el archivo `render.yaml`.
+5. Acepta la creacion de estos recursos:
+   - web service `qzmotorcenter-electrobike-api`
+   - database `qzmotorcenter-electrobike-db`
+6. Espera el primer deploy.
+7. Cuando termine, abre la URL publica del servicio y prueba:
+
+```text
+/api/health
+```
+
+### Configuracion que usa Render
+
+- El servicio web se despliega con `runtime: docker`.
+- Render asigna `PORT`, y la API ya escucha correctamente en `0.0.0.0`.
+- `DATABASE_URL` se inyecta desde la base Postgres creada por Render.
+- `DB_DIALECT=postgres` ya queda definido en el `render.yaml`.
+
+### Si prefieres seguir con MySQL en Render
+
+Segun la documentacion oficial de Render, MySQL puede desplegarse como `Private Service` con Docker y disco persistente, usando una URL interna tipo `mysql-foo:3306`. Aun asi, para este proyecto recomiendo Postgres en Render porque reduce complejidad operativa y encaja mejor con Blueprints y bases administradas.
 
 ## Pruebas unitarias
 
