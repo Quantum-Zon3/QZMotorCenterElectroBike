@@ -1,0 +1,40 @@
+{
+  "name": "qzmotorcenter-electrobike",
+  "version": "1.0.0",
+  "description": "Microservicio asincrono para la gestion de motocicletas electricas de QZ Motor Center",
+  "main": "dist/src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon --watch src --ext ts --exec ts-node src/server.ts",
+    "build": "tsc",
+    "start": "node dist/src/server.js",
+    "test": "vitest run",
+    "test:watch": "vitest",
+    "check": "tsc --noEmit"
+  },
+  "keywords": [
+    "microservice",
+    "typescript",
+    "express",
+    "sequelize",
+    "mysql",
+    "docker"
+  ],
+  "license": "ISC",
+  "dependencies": {
+    "cors": "^2.8.5",
+    "dotenv": "^16.4.5",
+    "express": "^5.1.0",
+    "mysql2": "^3.11.3",
+    "sequelize": "^6.37.3"
+  },
+  "devDependencies": {
+    "@types/cors": "^2.8.17",
+    "@types/express": "^5.0.0",
+    "@types/node": "^22.10.1",
+    "nodemon": "^3.1.7",
+    "ts-node": "^10.9.2",
+    "typescript": "^5.6.3",
+    "vitest": "^2.1.8"
+  }
+}
