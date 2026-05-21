@@ -6,9 +6,7 @@ COPY package*.json ./
 RUN npm ci
 
 COPY tsconfig.json ./
-COPY vitest.config.ts ./
 COPY src ./src
-COPY tests ./tests
 
 RUN npm run build
 
@@ -26,4 +24,3 @@ COPY --from=builder /app/dist ./dist
 EXPOSE 3000
 
 CMD ["node", "dist/src/server.js"]
-
